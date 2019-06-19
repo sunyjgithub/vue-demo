@@ -12,6 +12,9 @@
             title:''
           }
         },
+        props:{
+          addTodo:Function
+        },
       methods:{
         addItem(){
           const title=this.title.trim();
@@ -25,8 +28,7 @@
             complete:false
           }
 
-         /* this.addTodo(todo);*/
-          this.$emit("addTodo",todo);
+          this.addTodo(todo);
 
           this.title='';
         }

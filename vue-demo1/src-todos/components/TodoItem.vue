@@ -9,12 +9,11 @@
 </template>
 
 <script>
-
-    import PubSub from 'pubsub-js'
     export default {
         props:{
           todo:Object,
           index:Number,
+          deleteTodo:Function
         },
       data(){
           return{
@@ -34,8 +33,7 @@
         },
         deleteItem(){
           if(window.confirm(`确定删除该项吗？`)){
-             //发布消息 告诉app.vue组件进行删除操作
-            PubSub.publish('deleteTodo',this.index)
+             this.deleteTodo(this.index);
           }
 
         }
