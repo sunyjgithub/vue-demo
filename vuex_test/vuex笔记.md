@@ -73,3 +73,55 @@ actions: {
     commit('increment')
   }
 }
+
+
+
+
+****getters:****
+
+一：**Getters will receive the state as their 1st argument:**
+
+
+const store = new Vuex.Store({
+  state: {
+    todos: [
+      { id: 1, text: '...', done: true },
+      { id: 2, text: '...', done: false }
+    ]
+  },
+  getters: {
+    doneTodos: state => {   //state可以作为参数
+      return state.todos.filter(todo => todo.done)
+    }
+  }
+})
+
+
+Property-Style Access：通过属性的方式获取
+The getters will be exposed on the store.getters object, and you access values as properties:
+通过store.getters可以获取到getters对象  getters对象直接通过.属性的方式获取值
+
+store.getters.doneTodos // -> [{ id: 1, text: '...', done: true }]
+
+
+
+二：**Getters will also receive other getters as the 2nd argument:**
+
+getters: {
+  // ...
+  doneTodosCount: (state, getters) => {
+       return getters.doneTodos.length
+     }
+}
+store.getters.doneTodosCount // -> 1
+
+
+We can now easily make use of it inside any component:
+
+computed: {
+  doneTodosCount () {
+    return this.$store.getters.doneTodosCount  //以属性的方式访问
+  }
+}
+
+**Note that getters accessed as properties are cached as part of Vue's reactivity system**
