@@ -3,9 +3,13 @@
     <div class="todo-wrap">
         <!--绑定事件监听放在一个普通的div上没有效果-->
         <!--<div v-on:addTodo="addTodo" >我是父组件的一个div</div>-->
-        <todo-header ></todo-header><!--为当前这个组件绑定事件监听-->
-        <todo-list ></todo-list>
-        <todo-footer></todo-footer>
+        <todo-header v-on:addTodo="addTodo"></todo-header><!--为当前这个组件绑定事件监听-->
+        <todo-list :todos="todos" ></todo-list>
+        <todo-footer>
+          <input type="checkbox" v-model="isAllCheck" slot="checkAll"/>
+          <span slot="count">已完成{{completeSize}}/ 全部{{todos.length}}</span>
+          <button slot="del" class="btn btn-danger" v-show="completeSize>0" @click="deleteCompleteTodos">清除已完成任务</button>
+        </todo-footer>
     </div>
   </div>
 </template>
@@ -18,9 +22,21 @@
     import storageUtil from './util/storageUtil'
 
 
+    console.log(TodoHeader);
+
     export default {
 
+       data(){
+         return{
+           /*todos:[
+             {title:'吃饭',complete:false},
+             {title:'睡觉',complete:true},
+             {title:'打游戏',complete:false}
 
+           ]*/
+           todos:storageUtil.readTodos()
+         }
+       },
 
 
       computed:{

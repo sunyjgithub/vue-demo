@@ -1,35 +1,27 @@
 <template>
   <div class="todo-footer">
     <label>
-      <input type="checkbox" v-model="isAllCheck"/>
+      <!--<input type="checkbox" v-model="isAllCheck"/>-->
+      <slot name="checkAll"></slot>
     </label>
     <span>
-          <span>已完成{{completeSize}}</span> / 全部{{todos.length}}
-        </span>
-    <button class="btn btn-danger" v-show="completeSize>0" @click="deleteCompleteTodos">清除已完成任务</button>
+     <!--  <span>已完成{{completeSize}}/ 全部{{todos.length}}</span> -->
+       <slot name="count"></slot>
+    </span>
+    <!--<button class="btn btn-danger" v-show="completeSize>0" @click="deleteCompleteTodos">清除已完成任务</button>-->
+       <slot name="del"></slot>
   </div>
 </template>
 
 <script>
 
 
-  export default {
+    export default {
 
-    computed:{
 
-      isAllCheck:{
-        get(){
-          return this.completeSize===this.todos.length && this.completeSize>0
-        },
 
-        set(val){//val是当前checkbox的最新值
-          this.selectAllTodos(val);
-        }
-      }
+
     }
-
-
-  }
 </script>
 
 <style >

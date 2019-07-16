@@ -34,7 +34,8 @@
         },
         deleteItem(){
           if(window.confirm(`确定删除该项吗？`)){
-             this.$store.dispatch('deleteTodo',this.index)
+             //发布消息 告诉app.vue组件进行删除操作
+            PubSub.publish('deleteTodo',this.index)
           }
 
         }

@@ -25,7 +25,8 @@
             complete:false
           }
 
-         this.$store.dispatch('addTodo',todo)
+         /* this.addTodo(todo);*/
+          this.$emit("addTodo",todo);
 
           this.title='';
         }

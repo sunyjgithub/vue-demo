@@ -7,13 +7,12 @@
 <script>
 
     import TodoItem from './TodoItem'
-    import {mapState} from 'vuex'
     export default {
+       props:{
+         todos:Array,
+       },
       components:{
         TodoItem
-      },
-      computed:{
-        ...mapState(['todos'])
       }
     }
 </script>
