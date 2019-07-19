@@ -9,24 +9,26 @@
 </template>
 
 <script>
-
-
-  import {mapGetters}  from 'vuex'
-
-  export default {
+    import {mapGetters}  from 'vuex'
+    export default {
 
 
     computed:{
-      evenOrOdd(){
+      /*evenOrOdd(){
          return this.$store.getters.evenOrOdd("param");
+      }*/
+      evenOrOdd:function xxxx () {
+        return this.$store.getters.evenOrOdd("param");
       }
     },
     methods:{
       increment(){
         this.$store.dispatch('increment');
+        this.$lss.set('foo',123);
       },
       decrement(){
         this.$store.dispatch('decrement');
+        this.$lss.set('foo',456);
       },
 
       incrementIfOdd(){

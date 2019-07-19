@@ -9,7 +9,7 @@ view：view去读取state中保存的数据  以声明的方式将state映射到
 vuex解决的问题：多个视图依赖于同一个state状态    来自不同视图的行为需要变更同一个状态
 
 
-vue的一个插件
+**vue的一个插件**
 npm install vuex --save
 
 
@@ -194,3 +194,200 @@ computed: {
 
 
 vuex 中的getters 想当于vue中的computed  ，getters是vuex 中的计算属性 ，计算属性写起来是方法，但它是个属性
+
+
+===参考链接===
+
+**http://www.chinacion.cn/article/2805.html**
+
+
+mapState的源码分析  
+export function mapState (states) {
+   const res = {}   //定义一个对象
+   normalizeMap(states).forEach(({ key, val }) => {
+    // normalizeMap（）函数初始化states数据
+         res[key] = function mappedState () {
+           return typeof val === 'function'
+           // 判断val是否是函数
+           ? val.call(this, this.$store.state, this.$store.getters)
+           // 若val是函数，将store的state和getters作为参数，返回值作为mapped State的返回值
+           : this.$store.state[val]}})
+       return res // 返回的是一个函数
+    }
+//初始化方法
+-------------------------------------------------------------------------    
+ function normalizeMap (map) {
+        return Array.isArray(map) //判断state是否是数组
+        ? map.map(key => ({ key, val: key }))
+       // 是数组的话，调用map方法，将每一个数组元素转换成{key,val:key}
+       : Object.keys(map).map(key => ({ key, val: map[key] }))
+       // 否则就是对象，遍历对象，将每一个val变成val:key
+   }
+   
+   
+   **mapState的几种使用方式：**
+   
+   import { mapState } from 'vuex'
+   
+   export default {
+     // ...
+     computed: mapState({
+       
+       // arrow functions can make the code very succinct!
+       count: state => state.count,
+   
+       // passing the string value 'count' is same as `state => state.count`
+       countAlias: 'count',
+   
+       // to access local state with `this`, a normal function must be used
+       countPlusLocalState (state) {
+         return state.count + this.localCount
+       }
+     })
+   }
+   
+   
+   
+   We can also pass a string array to mapState when the name of a mapped computed property is the same as a state sub tree name.
+   
+   computed: mapState([
+     // map this.count to store.state.count
+     'count'
+   ])
+   
+   
+   
+   **mapGetters**
+   mapGetters
+   mapGetters 工具函数会将 store 中的 getter 映射到局部计算属性中。它的功能和 mapState 非常类似，我们来直接看它的实现：
+   
+  export function mapGetters (getters) {
+    const res = {}
+    normalizeMap(getters).forEach(({ key, val }) => {
+      res[key] = function mappedGetter () {
+          if (!(val in this.$store.getters)) {
+            console.error(`[vuex] unknown getter: ${val}`)       
+          }
+          return this.$store.getters[val]     
+      }
+    })
+    return res }
+
+不同的是它的 val 不能是函数，只能是一个字符串，而且会检查 val in this.$store.getters 的值，
+如果为 false 会输出一条错误日志。为了更直观地理解，我们来看一个简单的例子：
+import {mapGetters} from 'vuex'
+export default {
+    computed: {
+        ...mapGetters(['doneTodosCount', 'anotherGetter'])
+    }
+}
+经过 mapGetters 函数调用后的结果，如下所示：
+import {mapGetters} from 'vuex'
+export default {
+    computed: {
+        doneTodosCount() {
+            return this.$store.getters['doneTodosCount']
+        },
+        anotherGetter() {
+            return this.$store.getters['anotherGetter']
+        }
+    }
+}
+
+再看一个参数 mapGetters 参数是对象的例子：
+
+computed: mapGetters({
+    doneCount: 'doneTodosCount'
+})
+经过 mapGetters 函数调用后的结果，如下所示：
+computed: {
+    doneCount() {
+        return this.$store.getters['doneTodosCount']
+    }
+}
+
+
+
+**mapActions**
+
+
+mapActions
+mapActions 工具函数会将 store 中的 dispatch 方法映射到组件的 methods 中。
+和 mapState、mapGetters 也类似，只不过它映射的地方不是计算属性，而是组件的 methods 对象上。我们来直接看它的实现：
+
+
+export function mapActions(actions) {
+    const res = {}
+    normalizeMap(actions).forEach(({key, val}) => {
+        res[key] = function mappedAction(...args) {
+            return this.$store.dispatch.apply(this.$store, [val].concat(args))
+        }
+    }) 
+    return res
+}
+
+可以看到，函数的实现套路和 mapState、mapGetters 差不多，甚至更简单一些， 实际上就是做了一层函数包装。
+为了更直观地理解，我们来看一个简单的例子：
+
+import {mapActions} from 'vuex'
+export default {
+    methods: {
+        ...mapActions(['increment']),
+        ...mapActions({
+            add: 'increment'
+        })
+    }
+}
+经过 mapActions 函数调用后的结果，如下所示：
+
+import {mapActions} from 'vuex'
+export default {
+    methods: {
+        increment(...args) {
+            return this.$store.dispatch.apply(this.$store, ['increment'].concat(args))
+        }
+        add(...args) {
+            return this.$store.dispatch.apply(this.$store, ['increment'].concat(args))
+        }
+    }
+}
+
+
+**mapMutations**
+mapMutations 工具函数会将 store 中的 commit 方法映射到组件的 methods 中。和 mapActions 的功能几乎一样，我们来直接看它的实现：
+
+export function mapMutations(mutations) {
+    const res = {}
+    normalizeMap(mutations).forEach(({
+        key,
+        val
+    }) => {
+        res[key] = function mappedMutation(...args) {
+            return this.$store.commit.apply(this.$store, [val].concat(args))
+        }
+    }) return res
+}
+
+函数的实现几乎也和 mapActions 一样，唯一差别就是映射的是 store 的 commit 方法。为了更直观地理解，我们来看一个简单的例子：
+import {mapMutations} from 'vuex'
+export default {
+    methods: {
+        ...mapMutations(['increment']),
+        ...mapMutations({
+            add: 'increment'
+        })
+    }
+}
+经过 mapMutations 函数调用后的结果，如下所示：
+
+import {mapActions} from 'vuex'
+export default {
+    methods: {
+        increment(...args) {
+            return this.$store.commit.apply(this.$store, ['increment'].concat(args))
+        }
+        add(...args) {
+            return this.$store.commit.apply(this.$store, ['increment'].concat(args))
+        }
+    }
+}

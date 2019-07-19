@@ -51,7 +51,7 @@ const getters={
   }*/
   evenOrOdd(state){
     return function(param){
-      alert(param);
+      /*alert(param);*/
       state.count%2===0?'偶数':'奇数'
     }
   }
